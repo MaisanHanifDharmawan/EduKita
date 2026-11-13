@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Maisan Hanif D\\OneDrive\\Desktop\\dotnetproject\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D48C7F33-3414-4899-8125-6F00967D587C}|EduKita.Web\\EduKita.Web.csproj|c:\\users\\maisan hanif d\\onedrive\\desktop\\dotnetproject\\edukita.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D48C7F33-3414-4899-8125-6F00967D587C}|EduKita.Web\\EduKita.Web.csproj|solutionrelative:edukita.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Maisan Hanif D\\OneDrive\\Desktop\\dotnetproject\\EduKita.Web\\Program.cs",
+              "RelativeDocumentMoniker": "EduKita.Web\\Program.cs",
+              "ToolTip": "C:\\Users\\Maisan Hanif D\\OneDrive\\Desktop\\dotnetproject\\EduKita.Web\\Program.cs",
+              "RelativeToolTip": "EduKita.Web\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-24T04:10:16.716Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

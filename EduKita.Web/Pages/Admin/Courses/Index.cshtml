@@ -1,0 +1,63 @@
+@page
+@model EduKita.Web.Pages.Admin.Courses.IndexModel
+@{
+    ViewData["Title"] = "Kelola Kursus";
+}
+
+<div class="page-head">
+    <div class="small text-muted mb-1"><a asp-page="/Admin/Index">Kembali ke Panel Admin</a></div>
+    <h1>Semua Kursus</h1>
+    <p class="text-muted mb-0">Pantau dan moderasi seluruh kursus di platform</p>
+</div>
+
+<div class="content-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Kursus</th>
+                    <th>Instruktur</th>
+                    <th class="text-center">Pelajaran</th>
+                    <th class="text-center">Siswa</th>
+                    <th>Status</th>
+                    <th class="text-end pe-4">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var course in Model.Courses)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <a asp-page="/Courses/Details" asp-route-id="@course.Id" class="fw-semibold text-decoration-none">@course.Title</a>
+                            <div class="small text-muted d-flex gap-2 mt-1">
+                                <span class="badge-cat"><partial name="/Pages/Shared/_Icon.cshtml" model="course.Category?.Icon" />@course.Category?.Name</span>
+                                <span class="badge-level level-@(course.Level == "Menengah" ? "intermediate" : course.Level == "Lanjutan" ? "advanced" : "beginner")">@course.Level</span>
+                            </div>
+                        </td>
+                        <td>@course.Instructor?.FullName</td>
+                        <td class="text-center">@CourseStats.LessonCount(course)</td>
+                        <td class="text-center">@course.Enrollments.Count</td>
+                        <td>
+                            @if (course.IsPublished)
+                            {
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Terbit</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill bg-secondary-subtle text-dark-emphasis">Draf</span>
+                            }
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-inline-flex gap-1">
+                                <a asp-page="/Instructor/Courses/Manage" asp-route-id="@course.Id" class="btn btn-sm btn-outline-secondary">Kelola</a>
+                                <form method="post" asp-page-handler="TogglePublish" asp-route-id="@course.Id">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">@(course.IsPublished ? "Sembunyikan" : "Terbitkan")</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

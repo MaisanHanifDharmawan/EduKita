@@ -1,0 +1,169 @@
+@page
+@model EduKita.Web.Pages.Learn.CourseModel
+@{
+    ViewData["Title"] = Model.Course.Title;
+    var orderedLessons = CourseStats.OrderedLessons(Model.Course);
+    var currentIndex = Model.CurrentLesson is null ? -1 : orderedLessons.FindIndex(l => l.Id == Model.CurrentLesson.Id);
+    var prev = currentIndex > 0 ? orderedLessons[currentIndex - 1] : null;
+    var next = currentIndex >= 0 && currentIndex < orderedLessons.Count - 1 ? orderedLessons[currentIndex + 1] : null;
+    var percent = Model.TotalLessons == 0 ? 0 : (int)Math.Round(100.0 * Model.CompletedCount / Model.TotalLessons);
+}
+
+<div class="learn-wrap">
+    <aside class="learn-sidebar">
+        <a asp-page="/Learn/Index" class="back-link"><partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-left"' />Kursus Saya</a>
+        <h5 class="learn-course-title">@Model.Course.Title</h5>
+        @if (Model.Enrollment is not null)
+        {
+            <div class="progress-track">
+                <div class="progress-fill" style="width:@percent%"></div>
+            </div>
+            <div class="small text-muted mt-1 mb-2">
+                @Model.CompletedCount/@Model.TotalLessons pelajaran selesai (@percent%)
+                @if (Model.Enrollment.CompletedAt != null)
+                {
+                    <span class="flag-done ms-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"check"' />Kursus selesai</span>
+                }
+            </div>
+        }
+        else if (Model.CanManage)
+        {
+            <div class="alert alert-info py-2 small mb-2">Anda melihat sebagai pemilik kursus. <a asp-page="/Instructor/Courses/Manage" asp-route-id="@Model.Course.Id">Kelola kursus</a></div>
+        }
+
+        @foreach (var module in Model.Course.Modules)
+        {
+            <details class="learn-module" open>
+                <summary>
+                    <span class="module-badge">Modul @(Model.Course.Modules.IndexOf(module) + 1)</span>
+                    @module.Title
+                </summary>
+                <ul class="learn-lesson-list">
+                    @foreach (var lesson in module.Lessons)
+                    {
+                        var isDone = Model.CompletedLessonIds.Contains(lesson.Id);
+                        var isCurrent = Model.CurrentLesson?.Id == lesson.Id;
+                        var locked = Model.PreviewOnly && !lesson.IsPreview;
+                        <li class="@(isCurrent ? "current" : "")">
+                            @if (locked)
+                            {
+                                <span class="lesson-link locked">
+                                    <span class="lesson-state"><partial name="/Pages/Shared/_Icon.cshtml" model='"lock"' /></span>
+                                    <span class="lesson-name">@lesson.Title</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="lesson-link" asp-page="/Learn/Course" asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@lesson.Id">
+                                    <span class="lesson-state @(isDone ? "done" : "")">
+                                        @if (isDone)
+                                        {
+                                            <partial name="/Pages/Shared/_Icon.cshtml" model='"check"' />
+                                        }
+                                        else
+                                        {
+                                            <partial name="/Pages/Shared/_Icon.cshtml" model='"play"' />
+                                        }
+                                    </span>
+                                    <span class="lesson-name">@lesson.Title</span>
+                                </a>
+                            }
+                            <span class="lesson-dur">@lesson.DurationMinutes m</span>
+                        </li>
+                    }
+                </ul>
+            </details>
+        }
+    </aside>
+
+    <main class="learn-main">
+        @if (Model.CurrentLesson is null)
+        {
+            <div class="content-card empty-state">
+                <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"layers"' /></div>
+                <h3>Belum ada pelajaran</h3>
+                <p class="text-muted mb-0">Instruktur belum menambahkan pelajaran ke kursus ini.</p>
+            </div>
+        }
+        else
+        {
+            <div class="content-card">
+                <div class="small text-muted mb-1 d-flex align-items-center gap-2">
+                    @Model.CurrentLesson.CourseModule.Title
+                    @if (Model.CurrentLesson.IsPreview)
+                    {
+                        <span class="badge-preview">Pratinjau gratis</span>
+                    }
+                </div>
+                <h1 class="h3 fw-bold mb-3">@Model.CurrentLesson.Title</h1>
+                <div class="lesson-meta-row text-muted small mb-4">
+                    <span class="d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"clock"' />@Model.CurrentLesson.DurationMinutes menit</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.CurrentLesson.VideoUrl))
+                {
+                    <div class="ratio ratio-16x9 mb-4 rounded-3 overflow-hidden">
+                        <iframe src="@Model.CurrentLesson.VideoUrl" title="@Model.CurrentLesson.Title" allowfullscreen></iframe>
+                    </div>
+                }
+
+                <div class="lesson-content">
+                    @Html.Raw(Model.CurrentLesson.Content)
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    @if (prev is not null)
+                    {
+                        <a asp-page="/Learn/Course" asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@prev.Id"
+                           class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
+                            <partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-left"' /><span class="text-truncate" style="max-width:16rem">@prev.Title</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+
+                    <div class="d-flex gap-2">
+                        @if (Model.PreviewOnly)
+                        {
+                            <a asp-page="/Courses/Details" asp-route-id="@Model.Course.Id" class="btn btn-accent fw-semibold">Daftar untuk membuka semua pelajaran</a>
+                        }
+                        else if (Model.Enrollment is not null)
+                        {
+                            if (Model.CompletedLessonIds.Contains(Model.CurrentLesson.Id))
+                            {
+                                <span class="btn btn-outline-secondary disabled d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"circle-check"' />Pelajaran selesai</span>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="Complete"
+                                      asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@Model.CurrentLesson.Id">
+                                    <button type="submit" class="btn btn-primary fw-semibold">Tandai Selesai</button>
+                                </form>
+                            }
+                        }
+
+                        @if (next is not null && !Model.PreviewOnly)
+                        {
+                            <a asp-page="/Learn/Course" asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@next.Id"
+                               class="btn btn-primary d-inline-flex align-items-center gap-2">
+                                Pelajaran Berikutnya<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-right"' />
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.PreviewOnly)
+            {
+                <div class="alert alert-info mt-3">
+                    Anda sedang melihat <strong>pratinjau gratis</strong>. Daftarkan diri Anda untuk membuka
+                    @Model.TotalLessons pelajaran lengkap di kursus ini.
+                </div>
+            }
+        }
+    </main>
+</div>

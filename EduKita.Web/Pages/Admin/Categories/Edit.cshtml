@@ -1,0 +1,48 @@
+@page
+@model EduKita.Web.Pages.Admin.Categories.EditModel
+@{
+    ViewData["Title"] = "Edit Kategori";
+}
+
+<div class="page-head">
+    <div class="small text-muted mb-1"><a asp-page="Index" class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-left"' />Kelola Kategori</a></div>
+    <h1>Edit Kategori</h1>
+</div>
+
+<div class="content-card" style="max-width:560px">
+    <form method="post" asp-route-id="@Model.Category.Id">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="mb-3">
+            <label asp-for="Input.Name" class="form-label">Nama</label>
+            <input asp-for="Input.Name" class="form-control" />
+            <span asp-validation-for="Input.Name" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Icon" class="form-label">Kata kunci ikon</label>
+            <input asp-for="Input.Icon" class="form-control" maxlength="16" list="icon-keywords" />
+            <datalist id="icon-keywords">
+                <option value="code">Pemrograman</option>
+                <option value="globe">Web / dunia</option>
+                <option value="data">Data &amp; analitik</option>
+                <option value="brush">Desain</option>
+                <option value="briefcase">Bisnis</option>
+                <option value="book-open">Umum</option>
+            </datalist>
+            <div class="form-text">Kosongkan untuk ikon buku default.</div>
+            <span asp-validation-for="Input.Icon" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Description" class="form-label">Deskripsi</label>
+            <textarea asp-for="Input.Description" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="Input.Description" class="text-danger small"></span>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-semibold px-4">Simpan</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

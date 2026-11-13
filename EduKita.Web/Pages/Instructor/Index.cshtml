@@ -1,0 +1,103 @@
+@page
+@model EduKita.Web.Pages.Instructor.IndexModel
+@{
+    ViewData["Title"] = "Panel Instruktur";
+    var totalStudents = Model.MyCourses.Sum(c => c.Enrollments.Count);
+    var totalLessons = Model.MyCourses.Sum(c => CourseStats.LessonCount(c));
+}
+
+<div class="page-head d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1>Panel Instruktur</h1>
+        <p class="text-muted mb-0">Selamat mengajar, @Model.DisplayName</p>
+    </div>
+    <a asp-page="/Instructor/Courses/Create" class="btn btn-primary fw-semibold px-4 d-inline-flex align-items-center gap-2">
+        <partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />Buat Kursus Baru
+    </a>
+</div>
+
+<div class="stat-cards mb-4">
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' /></div>
+        <div><strong>@Model.MyCourses.Count</strong><span>Total Kursus</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' /></div>
+        <div><strong>@totalStudents</strong><span>Total Siswa</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' /></div>
+        <div><strong>@totalLessons</strong><span>Total Pelajaran</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"circle-check"' /></div>
+        <div><strong>@Model.MyCourses.Count(c => c.IsPublished)</strong><span>Kursus Terbit</span></div>
+    </div>
+</div>
+
+@if (Model.MyCourses.Count == 0)
+{
+    <div class="content-card empty-state">
+        <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' /></div>
+        <h3>Belum ada kursus</h3>
+        <p class="text-muted">Bagikan keahlian Anda! Mulai dengan membuat kursus pertama Anda.</p>
+        <a asp-page="/Instructor/Courses/Create" class="btn btn-primary fw-semibold px-4">Buat Kursus Pertama</a>
+    </div>
+}
+else
+{
+    <div class="content-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Kursus</th>
+                        <th>Kategori</th>
+                        <th class="text-center">Siswa</th>
+                        <th class="text-center">Pelajaran</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var course in Model.MyCourses)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <a asp-page="/Courses/Details" asp-route-id="@course.Id" class="fw-semibold text-decoration-none">@course.Title</a>
+                                <div class="small text-muted">@course.Level</div>
+                            </td>
+                            <td><span class="badge-cat"><partial name="/Pages/Shared/_Icon.cshtml" model="course.Category?.Icon" />@course.Category?.Name</span></td>
+                            <td class="text-center">@course.Enrollments.Count</td>
+                            <td class="text-center">@CourseStats.LessonCount(course)</td>
+                            <td>
+                                @if (course.IsPublished)
+                                {
+                                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Terbit</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill bg-secondary-subtle text-dark-emphasis">Draf</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
+                                    <a asp-page="/Instructor/Courses/Manage" asp-route-id="@course.Id" class="btn btn-sm btn-primary fw-semibold">Kelola</a>
+                                    <a asp-page="/Instructor/Courses/Students" asp-route-id="@course.Id" class="btn btn-sm btn-outline-secondary">Siswa</a>
+                                    <a asp-page="/Instructor/Courses/Edit" asp-route-id="@course.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <form method="post" asp-page-handler="TogglePublish" asp-route-id="@course.Id" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">@(course.IsPublished ? "Sembunyikan" : "Terbitkan")</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@course.Id" class="d-inline"
+                                          onsubmit="return confirm('Hapus kursus ini beserta semua modul, pelajaran, dan data siswanya? Tindakan ini tidak bisa dibatalkan.');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

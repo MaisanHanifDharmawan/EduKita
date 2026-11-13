@@ -1,0 +1,55 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Masuk";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="auth-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' /></div>
+            <h1>Selamat datang kembali</h1>
+            <p class="text-muted mb-0">Masuk untuk melanjutkan belajar</p>
+        </div>
+
+        <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="nama@email.com" />
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label"></label>
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label class="form-check-label" asp-for="Input.RememberMe"></label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 btn-lg fw-semibold">Masuk</button>
+        </form>
+
+        <div class="demo-accounts mt-4">
+            <div class="demo-title">Akun demo untuk mencoba</div>
+            <div class="demo-row"><span>Admin</span><code>admin@edukita.test / Admin123!</code></div>
+            <div class="demo-row"><span>Instruktur</span><code>budi@edukita.test / Instruktur123!</code></div>
+            <div class="demo-row"><span>Siswa</span><code>siti@edukita.test / Student123!</code></div>
+        </div>
+
+        <p class="text-center mt-4 mb-0 small">
+            Belum punya akun? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Daftar gratis</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

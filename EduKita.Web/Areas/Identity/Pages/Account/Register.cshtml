@@ -1,0 +1,80 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Daftar";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="auth-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' /></div>
+            <h1>Buat akun baru</h1>
+            <p class="text-muted mb-0">Mulai perjalanan belajar Anda di EduKita</p>
+        </div>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.FullName" class="form-label"></label>
+                <input asp-for="Input.FullName" class="form-control" autocomplete="name" placeholder="cth: Siti Rahma" />
+                <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="nama@email.com" />
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="form-text mb-3">Minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka.</div>
+
+            <label class="form-label d-block">Daftar sebagai</label>
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="role-choice">
+                        <input type="radio" asp-for="Input.Role" value="Student" checked="@(Model.Input.Role != "Instructor")" />
+                        <span class="role-box">
+                            <partial name="/Pages/Shared/_Icon.cshtml" model='"user"' />
+                            <strong>Siswa</strong>
+                            <small>Belajar dari berbagai kursus</small>
+                        </span>
+                    </label>
+                </div>
+                <div class="col-6">
+                    <label class="role-choice">
+                        <input type="radio" asp-for="Input.Role" value="Instructor" checked="@(Model.Input.Role == "Instructor")" />
+                        <span class="role-box">
+                            <partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' />
+                            <strong>Instruktur</strong>
+                            <small>Membuat dan mengelola kursus</small>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <span asp-validation-for="Input.Role" class="text-danger small"></span>
+
+            <button id="registerSubmit" type="submit" class="btn btn-primary w-100 btn-lg fw-semibold">Daftar Sekarang</button>
+        </form>
+
+        <p class="text-center mt-4 mb-0 small">
+            Sudah punya akun? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Masuk di sini</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

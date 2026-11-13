@@ -1,0 +1,55 @@
+@page
+@model EduKita.Web.Pages.Courses.IndexModel
+@{
+    ViewData["Title"] = "Jelajahi Kursus";
+}
+
+<div class="page-head">
+    <h1>Jelajahi <span class="t-accent">Kursus</span></h1>
+    <p class="text-muted mb-0">Temukan kursus yang tepat untuk tujuan belajar Anda</p>
+</div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-search">
+        <div class="search-field">
+            <partial name="/Pages/Shared/_Icon.cshtml" model='"search"' />
+            <input type="text" class="form-control" name="Q" value="@Model.Q" placeholder="Cari judul kursus atau instruktur..." aria-label="Cari kursus" />
+        </div>
+    </div>
+    <select class="form-select" name="CategoryId" aria-label="Kategori">
+        <option value="">Semua kategori</option>
+        @foreach (var cat in Model.Categories)
+        {
+            <!option value="@cat.Id" selected="@(Model.CategoryId == cat.Id)">@cat.Name</!option>
+        }
+    </select>
+    <select class="form-select" name="Level" aria-label="Level">
+        <!option value="semua" selected="@(string.IsNullOrEmpty(Model.Level) || Model.Level == "semua")">Semua level</!option>
+        <!option value="Pemula" selected="@(Model.Level == "Pemula")">Pemula</!option>
+        <!option value="Menengah" selected="@(Model.Level == "Menengah")">Menengah</!option>
+        <!option value="Lanjutan" selected="@(Model.Level == "Lanjutan")">Lanjutan</!option>
+    </select>
+    <button type="submit" class="btn btn-primary px-4 fw-semibold">Terapkan</button>
+</form>
+
+@if (Model.Courses.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"search"' /></div>
+        <h3>Tidak ada kursus ditemukan</h3>
+        <p class="text-muted">Coba ubah kata kunci atau filter pencarian Anda.</p>
+    </div>
+}
+else
+{
+    <p class="text-muted small mb-3">
+        Ditemukan <strong class="text-dark">@Model.Courses.Count</strong> kursus@if (!string.IsNullOrWhiteSpace(Model.Q))
+        {<span> untuk &ldquo;<span class="t-accent">@Model.Q</span>&rdquo;</span>}
+    </p>
+    <div class="course-grid">
+        @foreach (var course in Model.Courses)
+        {
+            <partial name="_CourseCard" model="(course, (int?)null)" />
+        }
+    </div>
+}

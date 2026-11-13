@@ -1,0 +1,106 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = null;
+}
+
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <h1>Belajar keterampilan <span class="hl">baru</span>,<br />raih masa depan lebih baik</h1>
+            <p class="hero-sub">
+                Ribuan pelajaran dari instruktur berpengalaman. Belajar dengan ritme Anda sendiri,
+                pantau progres Anda, dan bangun portofolio nyata.
+            </p>
+            <form class="hero-search" method="get" asp-page="/Courses/Index">
+                <span class="search-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"search"' /></span>
+                <input type="text" name="Q" placeholder="Cari kursus, cth: C#, Python, Desain..." aria-label="Cari kursus" />
+                <button type="submit" class="btn btn-accent fw-semibold px-4">Cari Kursus</button>
+            </form>
+        </div>
+        @if (Model.FeaturedCourses.Count > 0)
+        {
+            <div class="hero-preview" aria-hidden="true">
+                @foreach (var course in Model.FeaturedCourses.Take(3))
+                {
+                    <a class="preview-card" asp-page="/Courses/Details" asp-route-id="@course.Id" tabindex="-1">
+                        <div class="preview-kicker">
+                            <span>@course.Category?.Name</span>
+                            <span class="badge-level level-@(course.Level == "Menengah" ? "intermediate" : course.Level == "Lanjutan" ? "advanced" : "beginner")">@course.Level</span>
+                        </div>
+                        <div class="preview-title">@course.Title</div>
+                        <div class="preview-meta">
+                            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' />@CourseStats.LessonCount(course) pelajaran</span>
+                            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"clock"' />@CourseStats.DurationLabel(course)</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section class="stats-strip">
+    <div class="container stats-strip-grid">
+        <div class="stat-item"><strong>@Model.TotalCourses</strong><span>Kursus aktif</span></div>
+        <div class="stat-item"><strong>@Model.TotalLessons</strong><span>Total pelajaran</span></div>
+        <div class="stat-item"><strong>@Model.TotalStudents</strong><span>Pembelajar terdaftar</span></div>
+        <div class="stat-item"><strong>@Model.Categories.Count</strong><span>Kategori</span></div>
+    </div>
+</section>
+
+<section class="section container">
+    <div class="section-head">
+        <h2>Jelajahi <span class="t-accent">Kategori</span></h2>
+        <a asp-page="/Courses/Index" class="link-accent">Lihat semua <partial name="/Pages/Shared/_Icon.cshtml" model='"chevron-right"' /></a>
+    </div>
+    <div class="category-row">
+        @foreach (var cat in Model.Categories)
+        {
+            <a class="category-chip" asp-page="/Courses/Index" asp-route-categoryId="@cat.Id">
+                <partial name="/Pages/Shared/_Icon.cshtml" model="cat.Icon" />
+                <span>@cat.Name</span>
+                <span class="chip-count">@(cat.Courses.Count(c => c.IsPublished))</span>
+            </a>
+        }
+    </div>
+</section>
+
+<section class="section container">
+    <div class="section-head">
+        <h2>Kursus <span class="t-accent">Terbaru</span></h2>
+        <a asp-page="/Courses/Index" class="link-accent">Lihat semua <partial name="/Pages/Shared/_Icon.cshtml" model='"chevron-right"' /></a>
+    </div>
+    @if (Model.FeaturedCourses.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' /></div>
+            <p class="text-muted mb-0">Belum ada kursus yang dipublikasikan.</p>
+        </div>
+    }
+    else
+    {
+        <div class="course-grid">
+            @foreach (var course in Model.FeaturedCourses)
+            {
+                <partial name="_CourseCard" model="(course, (int?)null)" />
+            }
+        </div>
+    }
+</section>
+
+<section class="cta-band">
+    <span class="cta-motif" aria-hidden="true"><partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' /></span>
+    <span class="cta-motif motif-left" aria-hidden="true"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' /></span>
+    <div class="container text-center cta-inner">
+        <h2 class="text-white mb-3" style="font-family:var(--serif);font-weight:600">Punya <span class="t-accent">keahlian</span> yang ingin dibagikan?</h2>
+        <p class="mb-4" style="color:rgba(238,243,238,0.78)">Buat kursus di EduKita dan bantu ribuan orang belajar hal baru.</p>
+        <div class="d-flex gap-3 justify-content-center align-items-center flex-wrap">
+            <a asp-area="Identity" asp-page="/Account/Register" asp-route-role="Instructor"
+               class="btn btn-ghost-light btn-lg fw-semibold px-4 d-inline-flex align-items-center gap-2">
+                Jadi Instruktur<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-right"' />
+            </a>
+            <a asp-page="/Courses/Index" class="btn btn-link-light btn-lg px-2">Lihat kursus yang ada</a>
+        </div>
+    </div>
+</section>

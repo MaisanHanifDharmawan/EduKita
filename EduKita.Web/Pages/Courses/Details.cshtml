@@ -1,0 +1,157 @@
+@page
+@model EduKita.Web.Pages.Courses.DetailsModel
+@{
+    ViewData["Title"] = Model.Course.Title;
+    var lessons = CourseStats.OrderedLessons(Model.Course);
+    var levelClass = Model.Course.Level switch
+    {
+        "Menengah" => "level-intermediate",
+        "Lanjutan" => "level-advanced",
+        _ => "level-beginner"
+    };
+}
+
+<div class="detail-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small">
+                <li class="breadcrumb-item"><a asp-page="/Index">Beranda</a></li>
+                <li class="breadcrumb-item"><a asp-page="/Courses/Index">Kursus</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@(Model.Course.Title.Length > 40 ? Model.Course.Title[..40] + "…" : Model.Course.Title)</li>
+            </ol>
+        </nav>
+        <div class="d-flex flex-wrap gap-2 mb-2 align-items-center">
+            <span class="badge-cat"><partial name="/Pages/Shared/_Icon.cshtml" model="Model.Course.Category?.Icon" />@Model.Course.Category?.Name</span>
+            <span class="badge-level @levelClass">@Model.Course.Level</span>
+        </div>
+        <h1 class="mb-2">@Model.Course.Title</h1>
+        <p class="mb-3" style="color:rgba(238,243,238,0.8);max-width:44rem">@Model.Course.Summary</p>
+        <div class="detail-meta">
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"user"' />Instruktur: <strong>@Model.Course.Instructor?.FullName</strong></span>
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' />@lessons.Count pelajaran dalam @Model.Course.Modules.Count modul</span>
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"clock"' />@CourseStats.DurationLabel(Model.Course)</span>
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' />@Model.StudentCount siswa</span>
+        </div>
+    </div>
+</div>
+
+<div class="container detail-body">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="content-card mb-4">
+                <h2 class="h5 fw-bold mb-3">Tentang Kursus Ini</h2>
+                <div class="lesson-content">@Html.Raw(Model.Course.Description)</div>
+            </div>
+
+            <div class="content-card">
+                <h2 class="h5 fw-bold mb-3">Kurikulum — @lessons.Count Pelajaran</h2>
+                @if (lessons.Count == 0)
+                {
+                    <p class="text-muted mb-0">Kurikulum belum tersedia.</p>
+                }
+                @foreach (var module in Model.Course.Modules)
+                {
+                    <details class="module-accordion" open>
+                        <summary>
+                            <span class="module-badge">Modul @(Model.Course.Modules.IndexOf(module) + 1)</span>
+                            @module.Title
+                            <span class="module-meta">@module.Lessons.Count pelajaran</span>
+                        </summary>
+                        <ul class="lesson-list">
+                            @foreach (var lesson in module.Lessons)
+                            {
+                                <li>
+                                    @if (Model.IsEnrolled || Model.IsOwner || lesson.IsPreview)
+                                    {
+                                        <a asp-page="/Learn/Course" asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@lesson.Id">
+                                            <span class="lesson-state"><partial name="/Pages/Shared/_Icon.cshtml" model='"play"' /></span>
+                                            <span class="lesson-title">@lesson.Title</span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            <span class="lesson-state"><partial name="/Pages/Shared/_Icon.cshtml" model='"lock"' /></span>
+                                            <span class="lesson-title">@lesson.Title</span>
+                                        </span>
+                                    }
+                                    <span class="lesson-meta">
+                                        @if (lesson.IsPreview)
+                                        {
+                                            <span class="badge-preview">Pratinjau</span>
+                                        }
+                                        @lesson.DurationMinutes mnt
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    </details>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="content-card enroll-card">
+                <div class="enroll-price text-center">
+                    <span class="price-tag">Gratis</span>
+                    <span class="text-muted small d-block mt-1">Selamanya, tanpa biaya tersembunyi</span>
+                </div>
+                <div class="d-grid mt-3">
+                    @if (Model.IsEnrolled)
+                    {
+                        <a asp-page="/Learn/Course" asp-route-courseId="@Model.Course.Id" asp-route-lessonId="@Model.NextLessonId"
+                           class="btn btn-primary btn-lg fw-semibold">
+                            @(Model.ProgressPercent > 0 ? $"Lanjutkan Belajar ({Model.ProgressPercent}%)" : "Mulai Belajar")
+                        </a>
+                        <div class="progress-track mt-3">
+                            <div class="progress-fill" style="width:@Model.ProgressPercent%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mt-1">
+                            <span>Progres Anda</span><span>@Model.ProgressPercent%</span>
+                        </div>
+                    }
+                    else if (Model.IsOwner)
+                    {
+                        <a asp-page="/Instructor/Courses/Manage" asp-route-id="@Model.Course.Id" class="btn btn-primary btn-lg fw-semibold">Kelola Kursus Ini</a>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Enroll" asp-route-id="@Model.Course.Id">
+                            <button type="submit" class="btn btn-accent btn-lg fw-semibold w-100">Daftar Kursus Sekarang</button>
+                        </form>
+                        <p class="small text-muted text-center mt-3 mb-0">Akses semua pelajaran selamanya</p>
+                    }
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="instructor-box">
+                    <div class="avatar-initial">@(string.IsNullOrEmpty(Model.Course.Instructor?.FullName) ? "?" : Model.Course.Instructor.FullName.Trim()[0].ToString().ToUpper())</div>
+                    <div>
+                        <div class="fw-semibold">@Model.Course.Instructor?.FullName</div>
+                        <div class="small text-muted">Instruktur</div>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Course.Instructor?.Bio))
+                {
+                    <p class="small text-muted mt-2 mb-0">@Model.Course.Instructor.Bio</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.RelatedCourses.Count > 0)
+    {
+        <div class="section">
+            <div class="section-head">
+                <h2>Kursus <span class="t-accent">Terkait</span></h2>
+            </div>
+            <div class="course-grid">
+                @foreach (var course in Model.RelatedCourses)
+                {
+                    <partial name="_CourseCard" model="(course, (int?)null)" />
+                }
+            </div>
+        </div>
+    }
+</div>

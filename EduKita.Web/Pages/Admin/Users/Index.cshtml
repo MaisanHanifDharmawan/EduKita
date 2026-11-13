@@ -1,0 +1,74 @@
+@page
+@model EduKita.Web.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "Kelola Pengguna";
+    string RoleBadgeClass(string role) => role switch
+    {
+        "Admin" => "bg-danger-subtle text-danger-emphasis",
+        "Instructor" => "bg-warning-subtle text-warning-emphasis",
+        _ => "bg-primary-subtle text-primary-emphasis"
+    };
+    string RoleLabel(string role) => role switch
+    {
+        "Admin" => "Administrator",
+        "Instructor" => "Instruktur",
+        _ => "Siswa"
+    };
+}
+
+<div class="page-head">
+    <div class="small text-muted mb-1"><a asp-page="/Admin/Index" class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-left"' />Panel Admin</a></div>
+    <h1>Kelola Pengguna</h1>
+    <p class="text-muted mb-0">Ubah peran pengguna di platform</p>
+</div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-search">
+        <input type="text" class="form-control" name="Q" value="@Model.Q" placeholder="Cari nama atau email..." aria-label="Cari pengguna" />
+    </div>
+    <button type="submit" class="btn btn-primary px-4 fw-semibold">Cari</button>
+</form>
+
+<div class="content-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Pengguna</th>
+                    <th>Terdaftar</th>
+                    <th>Peran</th>
+                    <th class="text-end pe-4">Ubah Peran</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    var role = Model.UserRoles.TryGetValue(user.Id, out var r) ? r : "Student";
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="avatar-initial">@(string.IsNullOrEmpty(user.FullName) ? "?" : user.FullName.Trim()[0].ToString().ToUpper())</span>
+                                <div>
+                                    <div class="fw-semibold">@user.FullName</div>
+                                    <div class="small text-muted">@user.Email</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-muted small">@user.CreatedAt.ToLocalTime().ToString("d MMM yyyy")</td>
+                        <td><span class="badge rounded-pill @RoleBadgeClass(role)">@RoleLabel(role)</span></td>
+                        <td class="text-end pe-4">
+                            <form method="post" asp-page-handler="SetRole" asp-route-userId="@user.Id" class="d-inline-flex gap-2">
+                                <select name="role" class="form-select form-select-sm" style="width:auto" aria-label="Peran baru">
+                                    <!option value="Student" selected="@(role == "Student")">Siswa</!option>
+                                    <!option value="Instructor" selected="@(role == "Instructor")">Instruktur</!option>
+                                    <!option value="Admin" selected="@(role == "Admin")">Admin</!option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Simpan</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

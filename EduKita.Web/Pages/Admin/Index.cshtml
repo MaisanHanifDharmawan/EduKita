@@ -1,0 +1,81 @@
+@page
+@model EduKita.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Panel Admin";
+}
+
+<div class="page-head d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <h1>Panel Admin</h1>
+        <p class="text-muted mb-0">Ringkasan seluruh aktivitas platform EduKita</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-page="/Admin/Courses/Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' />Kelola Kursus</a>
+        <a asp-page="/Admin/Categories/Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"folder"' />Kategori</a>
+        <a asp-page="/Admin/Users/Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' />Kelola User</a>
+    </div>
+</div>
+
+<div class="stat-cards mb-4">
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' /></div>
+        <div><strong>@Model.TotalUsers</strong><span>Total Pengguna</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' /></div>
+        <div><strong>@Model.TotalInstructors</strong><span>Instruktur</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' /></div>
+        <div><strong>@Model.TotalCourses</strong><span>Kursus (@Model.TotalPublished terbit)</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' /></div>
+        <div><strong>@Model.TotalLessons</strong><span>Total Pelajaran</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"circle-check"' /></div>
+        <div><strong>@Model.TotalEnrollments</strong><span>Pendaftaran Kursus</span></div>
+    </div>
+</div>
+
+<div class="content-card p-0 overflow-hidden">
+    <div class="p-4 pb-2">
+        <h2 class="h6 fw-bold mb-0">Pendaftaran Terbaru</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Siswa</th>
+                    <th>Kursus</th>
+                    <th>Tanggal</th>
+                    <th class="pe-4 text-end">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.RecentEnrollments)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-semibold">@item.User?.FullName</div>
+                            <div class="small text-muted">@item.User?.Email</div>
+                        </td>
+                        <td>@item.Course?.Title</td>
+                        <td class="text-muted small">@item.EnrolledAt.ToLocalTime().ToString("d MMM yyyy")</td>
+                        <td class="pe-4 text-end">
+                            @if (item.CompletedAt != null)
+                            {
+                                <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Selesai</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill bg-secondary-subtle text-dark-emphasis">Berlangsung</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

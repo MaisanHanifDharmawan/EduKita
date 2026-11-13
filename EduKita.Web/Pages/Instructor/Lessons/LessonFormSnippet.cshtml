@@ -1,0 +1,32 @@
+@model EduKita.Web.Pages.Instructor.Lessons.LessonFormPageModel
+<div class="mb-3">
+    <label asp-for="Input.Title" class="form-label"></label>
+    <input asp-for="Input.Title" class="form-control" placeholder="cth: Pengenalan Variabel" />
+    <span asp-validation-for="Input.Title" class="text-danger small"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mb-3">
+        <label asp-for="Input.VideoUrl" class="form-label"></label>
+        <input asp-for="Input.VideoUrl" class="form-control" placeholder="https://www.youtube.com/embed/..." />
+        <div class="form-text">URL video embed (YouTube/ Vimeo). Jika dikosongkan, pelajaran hanya berisi teks.</div>
+        <span asp-validation-for="Input.VideoUrl" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="Input.DurationMinutes" class="form-label"></label>
+        <input asp-for="Input.DurationMinutes" class="form-control" type="number" min="1" max="600" />
+        <span asp-validation-for="Input.DurationMinutes" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Input.Content" class="form-label">Materi Pelajaran</label>
+    <textarea asp-for="Input.Content" class="form-control font-monospace" rows="12"
+              placeholder="<p>Tulis materi pelajaran di sini. Mendukung HTML sederhana: p, ul, strong, pre/code...</p>"></textarea>
+    <span asp-validation-for="Input.Content" class="text-danger small"></span>
+</div>
+
+<div class="form-check form-switch mb-4">
+    <input class="form-check-input" type="checkbox" asp-for="Input.IsPreview" role="switch" />
+    <label class="form-check-label" asp-for="Input.IsPreview">Buka pratinjau gratis (bisa dilihat tanpa mendaftar)</label>
+</div>

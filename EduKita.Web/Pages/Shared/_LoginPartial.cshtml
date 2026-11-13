@@ -1,0 +1,70 @@
+@using EduKita.Web.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    string RoleLabel(string role) => role switch
+    {
+        "Admin" => "Administrator",
+        "Instructor" => "Instruktur",
+        _ => "Siswa"
+    };
+}
+<ul class="navbar-nav ms-auto align-items-md-center gap-md-2">
+@if (SignInManager.IsSignedIn(User))
+{
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user is null ? new List<string>() : (await UserManager.GetRolesAsync(user)).ToList();
+    var role = roles.FirstOrDefault() ?? "Student";
+    var initial = string.IsNullOrWhiteSpace(user?.FullName) ? "?" : user.FullName.Trim()[0].ToString().ToUpper();
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle user-menu" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="avatar-initial">@initial</span>
+            <span class="user-name d-none d-md-inline">@user?.FullName</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <span class="dropdown-item-text small text-muted py-1">
+                    @user?.Email<br />
+                    <span class="badge rounded-pill bg-secondary-subtle text-dark-emphasis mt-1">@RoleLabel(role)</span>
+                </span>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            @if (role == "Admin")
+            {
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" asp-area="" asp-page="/Admin/Index">
+                        <partial name="/Pages/Shared/_Icon.cshtml" model='"dashboard"' />Panel Admin
+                    </a>
+                </li>
+            }
+            @if (role == "Admin" || role == "Instructor")
+            {
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" asp-area="" asp-page="/Instructor/Index">
+                        <partial name="/Pages/Shared/_Icon.cshtml" model='"graduation-cap"' />Panel Instruktur
+                    </a>
+                </li>
+            }
+            <li>
+                <a class="dropdown-item d-flex align-items-center gap-2" asp-area="" asp-page="/Learn/Index">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' />Kursus Saya
+                </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                    <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                        <partial name="/Pages/Shared/_Icon.cshtml" model='"log-out"' />Keluar
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </li>
+}
+else
+{
+    <li class="nav-item"><a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Masuk</a></li>
+    <li class="nav-item"><a class="btn btn-primary btn-sm px-3 fw-semibold" asp-area="Identity" asp-page="/Account/Register">Daftar Gratis</a></li>
+}
+</ul>

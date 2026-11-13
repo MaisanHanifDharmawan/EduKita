@@ -1,0 +1,25 @@
+@page
+@model EduKita.Web.Pages.Instructor.Courses.EditModel
+@{
+    ViewData["Title"] = "Edit Kursus";
+}
+
+<div class="page-head">
+    <h1>Edit Kursus</h1>
+    <p class="text-muted mb-0">@Model.Course.Title</p>
+</div>
+
+<div class="content-card">
+    <form method="post" asp-route-id="@Model.Course.Id">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+        <partial name="CourseFormSnippet" />
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary fw-semibold px-4">Simpan Perubahan</button>
+            <a asp-page="/Instructor/Courses/Manage" asp-route-id="@Model.Course.Id" class="btn btn-outline-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

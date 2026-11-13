@@ -1,0 +1,44 @@
+@model EduKita.Web.Pages.Instructor.Courses.CourseFormPageModel
+@* Partial form kursus — dipakai bersama oleh Create dan Edit *@
+<div class="mb-3">
+    <label asp-for="Input.Title" class="form-label"></label>
+    <input asp-for="Input.Title" class="form-control" placeholder="cth: Belajar React dari Nol" />
+    <span asp-validation-for="Input.Title" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Input.Summary" class="form-label"></label>
+    <input asp-for="Input.Summary" class="form-control" placeholder="Satu-dua kalimat yang menjual kursus Anda" />
+    <span asp-validation-for="Input.Summary" class="text-danger small"></span>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Input.CategoryId" class="form-label"></label>
+        <select asp-for="Input.CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+            <option value="">— Pilih kategori —</option>
+        </select>
+        <span asp-validation-for="Input.CategoryId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Input.Level" class="form-label">Level</label>
+        <select asp-for="Input.Level" class="form-select">
+            <option value="Pemula">Pemula</option>
+            <option value="Menengah">Menengah</option>
+            <option value="Lanjutan">Lanjutan</option>
+        </select>
+        <span asp-validation-for="Input.Level" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Input.Description" class="form-label"></label>
+    <textarea asp-for="Input.Description" class="form-control" rows="6"
+              placeholder="Jelaskan apa yang akan dipelajari siswa, untuk siapa kursus ini, dan prasyaratnya (mendukung HTML sederhana: &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;)"></textarea>
+    <span asp-validation-for="Input.Description" class="text-danger small"></span>
+</div>
+
+<div class="form-check form-switch mb-4">
+    <input class="form-check-input" type="checkbox" asp-for="Input.IsPublished" role="switch" />
+    <label class="form-check-label" asp-for="Input.IsPublished">Terbitkan sekarang (muncul di katalog publik)</label>
+</div>

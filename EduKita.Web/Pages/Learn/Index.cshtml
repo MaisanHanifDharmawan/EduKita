@@ -1,0 +1,60 @@
+@page
+@model EduKita.Web.Pages.Learn.IndexModel
+@{
+    ViewData["Title"] = "Kursus Saya";
+    var completedCount = Model.Enrollments.Count(e => e.CompletedAt != null);
+}
+
+<div class="page-head">
+    <h1>Halo, <span class="t-accent">@Model.DisplayName.Split(' ')[0]</span></h1>
+    <p class="text-muted mb-0">
+        Kamu mengikuti @Model.Enrollments.Count kursus, @completedCount di antaranya sudah selesai. Tetap semangat!
+    </p>
+</div>
+
+@if (Model.Enrollments.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"book-open"' /></div>
+        <h3>Belum ada kursus yang diikuti</h3>
+        <p class="text-muted">Yuk mulai dengan menjelajahi katalog kursus kami.</p>
+        <a asp-page="/Courses/Index" class="btn btn-primary fw-semibold px-4">Jelajahi Kursus</a>
+    </div>
+}
+else
+{
+    <div class="course-grid">
+        @foreach (var enrollment in Model.Enrollments)
+        {
+            var percent = CourseStats.Percent(enrollment);
+            var totalLessons = CourseStats.LessonCount(enrollment.Course);
+            var doneLessons = enrollment.LessonProgresses.Count;
+            var levelClass = enrollment.Course.Level == "Menengah" ? "intermediate" : enrollment.Course.Level == "Lanjutan" ? "advanced" : "beginner";
+            <div class="course-card">
+                <div class="course-kicker">
+                    <span class="cat-label">
+                        <span class="cat-tile"><partial name="/Pages/Shared/_Icon.cshtml" model="enrollment.Course.Category?.Icon" /></span>@enrollment.Course.Category?.Name
+                    </span>
+                    @if (enrollment.CompletedAt != null)
+                    {
+                        <span class="flag-done"><partial name="/Pages/Shared/_Icon.cshtml" model='"check"' />Selesai</span>
+                    }
+                    else
+                    {
+                        <span class="badge-level level-@levelClass">@enrollment.Course.Level</span>
+                    }
+                </div>
+                <h3 class="course-title">@enrollment.Course.Title</h3>
+                <p class="course-summary">oleh @enrollment.Course.Instructor?.FullName</p>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width:@percent%"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="small text-muted">@doneLessons dari @totalLessons pelajaran (@percent%)</span>
+                    <a asp-page="/Learn/Course" asp-route-courseId="@enrollment.Course.Id"
+                       class="btn btn-sm btn-primary fw-semibold">@(percent > 0 && percent < 100 ? "Lanjutkan" : percent == 100 ? "Review" : "Mulai")</a>
+                </div>
+            </div>
+        }
+    </div>
+}

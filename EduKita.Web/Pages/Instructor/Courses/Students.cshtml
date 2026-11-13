@@ -1,0 +1,77 @@
+@page
+@model EduKita.Web.Pages.Instructor.Courses.StudentsModel
+@{
+    ViewData["Title"] = $"Siswa: {Model.Course.Title}";
+}
+
+<div class="page-head">
+    <div class="small text-muted mb-1">
+        <a asp-page="/Instructor/Courses/Manage" asp-route-id="@Model.Course.Id" class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"arrow-left"' />Kembali ke Kelola Kursus</a>
+    </div>
+    <h1>Siswa Kursus</h1>
+    <p class="text-muted mb-0">@Model.Course.Title — @Model.Enrollments.Count siswa terdaftar</p>
+</div>
+
+@if (Model.Enrollments.Count == 0)
+{
+    <div class="content-card empty-state">
+        <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' /></div>
+        <h3>Belum ada siswa</h3>
+        <p class="text-muted mb-0">Publikasikan kursus dan bagikan tautannya agar siswa mulai mendaftar.</p>
+    </div>
+}
+else
+{
+    <div class="content-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Siswa</th>
+                        <th>Tanggal Daftar</th>
+                        <th style="width:30%">Progres</th>
+                        <th class="text-end pe-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enrollment in Model.Enrollments)
+                    {
+                        var percent = CourseStats.Percent(enrollment);
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="avatar-initial">@(string.IsNullOrEmpty(enrollment.User?.FullName) ? "?" : enrollment.User.FullName.Trim()[0].ToString().ToUpper())</span>
+                                    <div>
+                                        <div class="fw-semibold">@enrollment.User?.FullName</div>
+                                        <div class="small text-muted">@enrollment.User?.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted small">@enrollment.EnrolledAt.ToLocalTime().ToString("d MMM yyyy")</td>
+                            <td>
+                                <div class="progress-track">
+                                    <div class="progress-fill" style="width:@percent%"></div>
+                                </div>
+                                <span class="small text-muted">@enrollment.LessonProgresses.Count/@CourseStats.LessonCount(enrollment.Course) pelajaran (@percent%)</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                @if (enrollment.CompletedAt != null)
+                                {
+                                    <span class="badge rounded-pill bg-success-subtle text-success-emphasis">Selesai</span>
+                                }
+                                else if (percent > 0)
+                                {
+                                    <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Sedang berjalan</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">Baru saja</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduKita.Web", "EduKita.Web\EduKita.Web.csproj", "{D48C7F33-3414-4899-8125-6F00967D587C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D48C7F33-3414-4899-8125-6F00967D587C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D48C7F33-3414-4899-8125-6F00967D587C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D48C7F33-3414-4899-8125-6F00967D587C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D48C7F33-3414-4899-8125-6F00967D587C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

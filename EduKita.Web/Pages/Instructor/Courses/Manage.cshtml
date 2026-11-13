@@ -1,0 +1,111 @@
+@page
+@model EduKita.Web.Pages.Instructor.Courses.ManageModel
+@{
+    ViewData["Title"] = $"Kelola: {Model.Course.Title}";
+}
+
+<div class="page-head">
+    <div class="small text-muted mb-1">
+        <a asp-page="/Instructor/Index">Kembali ke Panel Instruktur</a>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <h1>@Model.Course.Title</h1>
+            <p class="text-muted mb-0 d-flex flex-wrap align-items-center gap-3">
+                <span class="badge-cat"><partial name="/Pages/Shared/_Icon.cshtml" model="Model.Course.Category?.Icon" />@Model.Course.Category?.Name</span>
+                <span class="badge-level level-@(Model.Course.Level == "Menengah" ? "intermediate" : Model.Course.Level == "Lanjutan" ? "advanced" : "beginner")">@Model.Course.Level</span>
+                <span class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' />@Model.StudentCount siswa</span>
+                <span class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' />@CourseStats.LessonCount(Model.Course) pelajaran</span>
+                <span class="d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"clock"' />@CourseStats.DurationLabel(Model.Course)</span>
+            </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-page="/Instructor/Courses/Edit" asp-route-id="@Model.Course.Id" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"pencil"' />Edit Info</a>
+            <a asp-page="/Instructor/Courses/Students" asp-route-id="@Model.Course.Id" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"users"' />Lihat Siswa</a>
+            <a asp-page="/Courses/Details" asp-route-id="@Model.Course.Id" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><partial name="/Pages/Shared/_Icon.cshtml" model='"eye"' />Pratinjau</a>
+            <form method="post" asp-page-handler="TogglePublish" asp-route-id="@Model.Course.Id">
+                <button type="submit" class="btn @(Model.Course.IsPublished ? "btn-outline-secondary" : "btn-primary") fw-semibold">
+                    @(Model.Course.IsPublished ? "Sembunyikan" : "Terbitkan")
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="content-card mb-4">
+    <h2 class="h6 fw-bold mb-3">Struktur Kursus</h2>
+
+    @if (Model.Course.Modules.Count == 0)
+    {
+        <div class="text-center py-4 text-muted">
+            <div class="empty-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"layers"' /></div>
+            Belum ada modul. Tambahkan modul pertama Anda di bawah.
+        </div>
+    }
+
+    @foreach (var module in Model.Course.Modules)
+    {
+        <div class="module-admin">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <strong class="d-flex align-items-center gap-2">
+                    <span class="module-badge">Modul @(Model.Course.Modules.IndexOf(module) + 1)</span>
+                    @module.Title
+                </strong>
+                <div class="d-flex gap-2">
+                    <a asp-page="/Instructor/Lessons/Create" asp-route-moduleId="@module.Id" class="btn btn-sm btn-primary fw-semibold d-inline-flex align-items-center gap-1"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />Pelajaran</a>
+                    <form method="post" asp-page-handler="DeleteModule" asp-route-id="@Model.Course.Id" asp-route-moduleId="@module.Id"
+                          onsubmit="return confirm('Hapus modul ini beserta semua pelajarannya?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus Modul</button>
+                    </form>
+                </div>
+            </div>
+
+            @if (module.Lessons.Count == 0)
+            {
+                <div class="small text-muted mt-2">Belum ada pelajaran di modul ini.</div>
+            }
+            else
+            {
+                <div class="table-responsive mt-2">
+                    <table class="table table-sm align-middle mb-0">
+                        <tbody>
+                            @foreach (var lesson in module.Lessons)
+                            {
+                                <tr>
+                                    <td style="width:44px" class="text-muted">@lesson.Position.</td>
+                                    <td>
+                                        @lesson.Title
+                                        @if (lesson.IsPreview)
+                                        {
+                                            <span class="badge-preview">Pratinjau</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(lesson.VideoUrl))
+                                        {
+                                            <span class="text-muted ms-1 d-inline-flex align-items-center" title="Memiliki video"><partial name="/Pages/Shared/_Icon.cshtml" model='"video"' /></span>
+                                        }
+                                    </td>
+                                    <td class="text-muted small">@lesson.DurationMinutes mnt</td>
+                                    <td class="text-end">
+                                        <a asp-page="/Instructor/Lessons/Edit" asp-route-id="@lesson.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <form method="post" asp-page-handler="DeleteLesson" asp-route-id="@Model.Course.Id" asp-route-lessonId="@lesson.Id" class="d-inline"
+                                              onsubmit="return confirm('Hapus pelajaran ini?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="content-card">
+    <h2 class="h6 fw-bold mb-3">Tambah Modul Baru</h2>
+    <form method="post" asp-page-handler="AddModule" asp-route-id="@Model.Course.Id" class="d-flex gap-2">
+        <input asp-for="NewModuleTitle" class="form-control" placeholder="cth: Pengenalan Dasar" />
+        <button type="submit" class="btn btn-primary fw-semibold px-4">Tambah Modul</button>
+    </form>
+</div>

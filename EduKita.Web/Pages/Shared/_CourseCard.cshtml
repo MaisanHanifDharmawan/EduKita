@@ -1,0 +1,36 @@
+@model (Course Course, int? ProgressPercent)
+@{
+    var c = Model.Course;
+    var lessons = CourseStats.OrderedLessons(c);
+    var levelClass = c.Level switch
+    {
+        "Menengah" => "level-intermediate",
+        "Lanjutan" => "level-advanced",
+        _ => "level-beginner"
+    };
+}
+<div class="course-card">
+    <div class="course-kicker">
+        <span class="cat-label">
+            <span class="cat-tile"><partial name="/Pages/Shared/_Icon.cshtml" model="c.Category?.Icon" /></span>@c.Category?.Name
+        </span>
+        <span class="badge-level @levelClass">@c.Level</span>
+    </div>
+    <h3 class="course-title">@c.Title</h3>
+    <p class="course-summary">@c.Summary</p>
+    <div class="course-meta-row">
+        <span><partial name="/Pages/Shared/_Icon.cshtml" model='"user"' />@c.Instructor?.FullName</span>
+        <span>
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"file-text"' />@lessons.Count</span>
+            <span><partial name="/Pages/Shared/_Icon.cshtml" model='"clock"' />@CourseStats.DurationLabel(c)</span>
+        </span>
+    </div>
+    @if (Model.ProgressPercent is int p)
+    {
+        <div class="progress-track mt-3">
+            <div class="progress-fill" style="width:@(p)%"></div>
+        </div>
+        <div class="small text-muted mt-1">@p% selesai</div>
+    }
+    <a class="stretched-link" asp-page="/Courses/Details" asp-route-id="@c.Id" aria-label="Lihat kursus @c.Title"></a>
+</div>
